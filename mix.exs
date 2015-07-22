@@ -36,9 +36,11 @@ defmodule ElixirFriends.Mixfile do
       {:phoenix_html, "~> 1.0"},
       {:phoenix_live_reload, "~> 0.4", only: :dev},
       {:cowboy, "~> 1.0"},
+      {:timex, github: "bitwalker/timex", override: true},
       {:extwitter, "~> 0.4"},
       {:oauth, github: "tim/erlang-oauth"},
-      {:scrivener, "~> 0.9.0"}
+      {:scrivener, "~> 0.9.0"},
+      {:rethinkdb, github: "hamiltop/rethinkdb-elixir", override: true},
     ]
   end
 end

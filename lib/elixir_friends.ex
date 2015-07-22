@@ -2,7 +2,7 @@ defmodule ElixirFriends do
   use Application
   import Supervisor.Spec
 
-  @term "elixirfriends"
+  @term "SandraBland"
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -14,6 +14,8 @@ defmodule ElixirFriends do
       supervisor(ElixirFriends.Endpoint, []),
       # Start the Ecto repository
       worker(ElixirFriends.Repo, []),
+      # Start the RethinkDB Connection
+      worker(ElixirFriends.Database, []),
       worker(Task, [fn -> ElixirFriends.ImageTweetStreamer.stream(@term) |> Enum.to_list end])
     ]
 

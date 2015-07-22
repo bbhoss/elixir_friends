@@ -1,4 +1,6 @@
 defmodule ElixirFriends.ImageTweetStreamer do
+  alias RethinkDB.Query
+
   def stream(search_term) do
     ExTwitter.stream_filter(track: search_term)
     |> Stream.filter(&has_images?/1)
@@ -12,14 +14,18 @@ defmodule ElixirFriends.ImageTweetStreamer do
 
   defp store_tweet(%ExTwitter.Model.Tweet{}=tweet) do
     IO.puts "storing this tweet: #{inspect(tweet, pretty: true, limit: 2_000)}"
-    post = %ElixirFriends.Post{
+    post = %{
       image_url: first_photo(tweet).media_url,
       content: tweet.text,
       source_url: first_photo(tweet).expanded_url,
       username: tweet.user.screen_name
     }
     IO.puts "storing this post: #{inspect post}"
-    ElixirFriends.Repo.insert(post)
+    Query.db("elixirfriends")
+      |> Query.table("tweets")
+      |> Query.insert(post)
+      |> ElixirFriends.Database.run
+    # ElixirFriends.Repo.insert(post)
   end
 
   defp photos(%ExTwitter.Model.Tweet{}=tweet) do
