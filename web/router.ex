@@ -19,6 +19,10 @@ defmodule ElixirFriends.Router do
     resources "/posts", PostController, only: [:show]
   end
 
+  socket "/ws", ElixirFriends do
+    channel "tweets", TweetsChannel
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", ElixirFriends do
   #   pipe_through :api

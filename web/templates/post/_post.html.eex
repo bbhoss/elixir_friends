@@ -1,0 +1,15 @@
+<div class="three wide column">
+  <div class="ui card">
+    <div class="image">
+      <img src='<%= @post["image_url"] %>' />
+    </div>
+    <div class="content">
+      <div class="header">
+        <%= @post["username"] %>
+      </div>
+      <div class="description">
+        <%= @post["content"] %>
+      </div>
+    </div>
+  </div>
+</div>

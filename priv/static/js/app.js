@@ -32221,20 +32221,22 @@ require.register("web/static/js/app", function(exports, require, module) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _phoenix = require("phoenix");
 
-// let socket = new Socket("/ws")
-// socket.connect()
-// let chan = socket.chan("topic:subtopic", {})
-// chan.join().receive("ok", chan => {
-//   console.log("Success!")
-// })
-
+var socket = new _phoenix.Socket("/ws");
+socket.connect();
+var chan = socket.chan("tweets");
+chan.join().receive("ok", function (chan) {
+    console.log("Subscribed to tweets");
+});
+chan.on("tweet", function (msg) {
+    console.log(msg);
+    $('#tweets').prepend(msg.view);
+});
 var App = {};
-
 exports["default"] = App;
 module.exports = exports["default"];
 });

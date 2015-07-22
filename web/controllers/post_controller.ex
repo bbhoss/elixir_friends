@@ -1,18 +1,19 @@
 defmodule ElixirFriends.PostController do
   use ElixirFriends.Web, :controller
-  import Ecto.Query
+  import RethinkDB.Query
 
   alias ElixirFriends.Post
 
   plug :scrub_params, "post" when action in [:create, :update]
   plug :action
 
-  def index(conn, params) do
-    posts_page = Post
-    |> order_by([p], desc: p.inserted_at)
-    |> ElixirFriends.Repo.paginate(page: params["page"])
+  def index(conn, _params) do
+    posts_page = db("elixirfriends")
+      |> table("tweets")
+      |> limit(10)
+      |> ElixirFriends.Database.run
 
-    render(conn, "index.html", posts_page: posts_page)
+    render(conn, "index.html", posts_page: posts_page.data)
   end
 
   def new(conn, _params) do

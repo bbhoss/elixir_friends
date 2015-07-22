@@ -13,14 +13,14 @@ defmodule ElixirFriends.ImageTweetStreamer do
   end
 
   defp store_tweet(%ExTwitter.Model.Tweet{}=tweet) do
-    IO.puts "storing this tweet: #{inspect(tweet, pretty: true, limit: 2_000)}"
+    # IO.puts "storing this tweet: #{inspect(tweet, pretty: true, limit: 2_000)}"
     post = %{
       image_url: first_photo(tweet).media_url,
       content: tweet.text,
       source_url: first_photo(tweet).expanded_url,
       username: tweet.user.screen_name
     }
-    IO.puts "storing this post: #{inspect post}"
+    # IO.puts "storing this post: #{inspect post}"
     Query.db("elixirfriends")
       |> Query.table("tweets")
       |> Query.insert(post)
