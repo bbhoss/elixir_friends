@@ -13,22 +13,31 @@ defmodule ElixirFriends.TweetsChannel do
   end
 
   def handle_info(:after_join, socket) do
-    spawn fn ->
-      db("elixirfriends")
-        |> table("tweets")
-        |> changes
-        |> ElixirFriends.Database.run 
-        |> Stream.take_every(1) |> Enum.each fn(change) ->
-        %{"new_val" => post} = change
-        html = Phoenix.View.render_to_string ElixirFriends.PostView, "_post.html", post: post
-        push socket, "tweet", %{view: html}
-     end
-    end
+    {:ok, sv} = Task.Supervisor.start_link(restart: :transient)
+    Task.Supervisor.start_child sv, fn -> tweetstream(socket) end
     {:noreply, socket}
   end
 
   # Add authorization logic here as required.
   defp authorized?(_payload) do
     true
+  end
+
+  defp tweetstream(socket) do
+    require RethinkDB.Lambda
+    import RethinkDB.Lambda
+    db("elixirfriends")
+      |> table("tweets")
+      # Filter only on Chicago
+      # |> filter(lambda fn (tweet) ->
+      #   tweet[:content] |> match("(?i)Chicago")
+      # end)
+      |> changes
+      |> ElixirFriends.Database.run
+      |> Stream.take_every(1) |> Enum.each fn(change) ->
+      %{"new_val" => post} = change
+      html = Phoenix.View.render_to_string ElixirFriends.PostView, "_post.html", post: post
+      push socket, "tweet", %{view: html}
+   end
   end
 end
