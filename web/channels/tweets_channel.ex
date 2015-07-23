@@ -18,8 +18,8 @@ defmodule ElixirFriends.TweetsChannel do
         |> table("tweets")
         |> changes
         |> ElixirFriends.Database.run 
-      q |> Stream.chunk(1) |> Enum.each fn(change) ->
-        %{"new_val" => post} = hd change
+      q |> Stream.take(1) |> Enum.each fn(change) ->
+        %{"new_val" => post} = change
         html = Phoenix.View.render_to_string ElixirFriends.PostView, "_post.html", post: post
         push socket, "tweet", %{view: html}
      end
