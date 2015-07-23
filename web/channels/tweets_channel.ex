@@ -14,11 +14,11 @@ defmodule ElixirFriends.TweetsChannel do
 
   def handle_info(:after_join, socket) do
     spawn fn ->
-      q = db("elixirfriends")
+      db("elixirfriends")
         |> table("tweets")
         |> changes
         |> ElixirFriends.Database.run 
-      q |> Stream.take(1) |> Enum.each fn(change) ->
+        |> Stream.take_every(1) |> Enum.each fn(change) ->
         %{"new_val" => post} = change
         html = Phoenix.View.render_to_string ElixirFriends.PostView, "_post.html", post: post
         push socket, "tweet", %{view: html}
