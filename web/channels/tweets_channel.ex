@@ -24,20 +24,21 @@ defmodule ElixirFriends.TweetsChannel do
   end
 
   defp tweetstream(socket) do
+    import RethinkDB.Query
     require RethinkDB.Lambda
     import RethinkDB.Lambda
     db("elixirfriends")
       |> table("tweets")
-      # Filter only on Chicago
-      # |> filter(lambda fn (tweet) ->
-      #   tweet[:content] |> match("(?i)Chicago")
-      # end)
-      |> changes
-      |> ElixirFriends.Database.run
-      |> Stream.take_every(1) |> Enum.each fn(change) ->
-      %{"new_val" => post} = change
-      html = Phoenix.View.render_to_string ElixirFriends.PostView, "_post.html", post: post
-      push socket, "tweet", %{view: html}
-   end
+      |> filter(lambda fn (tweet) ->
+        tweet[:content] |> match("(?i)Chicago")
+      end) |>
+      changes |>
+      ElixirFriends.Database.run |>
+      Stream.take_every(1) |>
+      Enum.each fn(change) ->
+        %{"new_val" => post} = change
+        html = Phoenix.View.render_to_string ElixirFriends.PostView, "_post.html", post: post
+        push socket, "tweet", %{view: html}
+      end
   end
 end
